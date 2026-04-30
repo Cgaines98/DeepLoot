@@ -8,7 +8,7 @@ const Header: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <Layout color="#3d5afe" />
         <Link to="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'white', textDecoration: 'none' }}>
-          Moxfield Dupe
+          DeepLoot
         </Link>
       </div>
       <nav className="nav-links">

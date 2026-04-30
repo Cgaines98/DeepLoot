@@ -24,9 +24,21 @@ const Home: React.FC = () => {
       <div className="deck-grid">
         {decks.map(deck => (
           <Link key={deck.id} to={`/decks/${deck.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div className="deck-card">
-              <h3>{deck.name}</h3>
-              <p>{deck.cards.length} cards</p>
+            <div className="deck-card" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {deck.cards && deck.cards.length > 0 && deck.cards[0].image_uris && (
+                <div style={{ height: '150px', overflow: 'hidden', borderRadius: '4px', marginBottom: '5px' }}>
+                  <img 
+                    src={deck.cards[0].image_uris.normal} 
+                    alt={deck.name} 
+                    style={{ width: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} 
+                  />
+                </div>
+              )}
+              <div>
+                <h3 style={{ margin: '0 0 5px 0' }}>{deck.name}</h3>
+                <p style={{ color: '#aaa', fontSize: '0.85rem', margin: '0 0 5px 0' }}>{deck.format}</p>
+                <p style={{ margin: 0, fontSize: '0.9rem' }}>{deck.cards?.length || 0} cards</p>
+              </div>
             </div>
           </Link>
         ))}
