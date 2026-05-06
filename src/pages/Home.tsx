@@ -2,14 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { deckService } from '../services/api';
 import { Deck } from '../types';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Trash2 } from 'lucide-react';
 
 const Home: React.FC = () => {
   const [decks, setDecks] = useState<Deck[]>([]);
 
   useEffect(() => {
-    deckService.getDecks().then(setDecks);
+    loadDecks();
   }, []);
+
+  const loadDecks = () => {
+    deckService.getDecks().then(setDecks);
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string, name: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+      try {
+        await deckService.deleteDeck(id);
+        loadDecks();
+      } catch (error) {
+        console.error('Failed to delete deck', error);
+        alert('Failed to delete deck');
+      }
+    }
+  };
 
   return (
     <div>
@@ -24,7 +42,22 @@ const Home: React.FC = () => {
       <div className="deck-grid">
         {decks.map(deck => (
           <Link key={deck.id} to={`/decks/${deck.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div className="deck-card" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="deck-card" style={{ display: 'flex', flexDirection: 'column', gap: '10px', position: 'relative' }}>
+              <button 
+                onClick={(e) => handleDelete(e, deck.id!, deck.name)}
+                style={{ 
+                  position: 'absolute', 
+                  top: '10px', 
+                  right: '10px', 
+                  zIndex: 2,
+                  padding: '5px',
+                  background: 'rgba(244, 67, 54, 0.8)',
+                  borderRadius: '4px'
+                }}
+                title="Delete Deck"
+              >
+                <Trash2 size={16} />
+              </button>
               {deck.cards && deck.cards.length > 0 && deck.cards[0].image_uris && (
                 <div style={{ height: '150px', overflow: 'hidden', borderRadius: '4px', marginBottom: '5px' }}>
                   <img 

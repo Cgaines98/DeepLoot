@@ -92,6 +92,9 @@ export const deckService = {
     const response = await axios.get(`${BACKEND_API}/decks/${id}`);
     return mapDeck(response.data);
   },
+  deleteDeck: async (id: string): Promise<void> => {
+    await axios.delete(`${BACKEND_API}/decks/${id}`);
+  },
   // Keep saveDeck for compatibility but implement it as update or create
   saveDeck: async (deck: Deck): Promise<Deck> => {
     if (deck.id) {

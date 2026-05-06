@@ -123,6 +123,19 @@ const DeckEditor: React.FC = () => {
     }
   };
 
+  const deleteDeck = async () => {
+    if (!deck.id) return;
+    if (window.confirm(`Are you sure you want to delete "${deck.name}"?`)) {
+      try {
+        await deckService.deleteDeck(deck.id);
+        navigate('/');
+      } catch (error) {
+        console.error('Failed to delete deck', error);
+        alert('Failed to delete deck');
+      }
+    }
+  };
+
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '30px', position: 'relative' }}>
       {/* Hover Preview */}
@@ -184,6 +197,11 @@ const DeckEditor: React.FC = () => {
               <button onClick={saveDeck} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Save size={18} /> Save Deck
               </button>
+              {deck.id && (
+                <button onClick={deleteDeck} style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f44336' }}>
+                  <Trash2 size={18} /> Delete
+                </button>
+              )}
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
