@@ -4,7 +4,7 @@ The frontend for MockField, a Magic: The Gathering deck-building application. Th
 
 ## Features
 
-- **Authentication**: Integrated with Auth0 for secure user login and logout.
+- **Authentication**: Integrated with Auth0 for secure user login and logout. Uses Authorization Code Flow with PKCE and Refresh Token Rotation for enhanced security.
 - **Theme Support**: Light and dark mode toggle, with automatic detection of browser preference.
 - **Card Search**: Real-time card search powered by Scryfall.
 - **Deck Management**: Create, edit, and delete decks. Supports both list and grid views in the editor.

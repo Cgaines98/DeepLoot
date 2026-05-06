@@ -16,6 +16,8 @@ root.render(
         redirect_uri: window.location.origin,
         audience: "https://api.mockfield.com"
       }}
+      useRefreshTokens={true}
+      cacheLocation="localstorage"
     >
       <App />
     </Auth0Provider>
