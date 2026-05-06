@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Deck, DeckCard } from '../types';
 import { scryfallService, deckService } from '../services/api';
 import { Search, Save, Trash2, Plus, Minus } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const DeckEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { token } = useAuth();
   const [deck, setDeck] = useState<Deck>({ name: 'New Deck', format: 'Standard', mainboard: [], sideboard: [], cards: [] });
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Card[]>([]);
@@ -14,10 +16,10 @@ const DeckEditor: React.FC = () => {
   const [hoverCard, setHoverCard] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id && id !== 'new') {
+    if (id && id !== 'new' && token) {
       deckService.getDeck(id).then(setDeck);
     }
-  }, [id]);
+  }, [id, token]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();

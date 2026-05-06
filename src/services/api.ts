@@ -54,13 +54,8 @@ const mapDeck = (deck: any): Deck => ({
 
 export const deckService = {
   getDecks: async (): Promise<Deck[]> => {
-    try {
-      const response = await api.get('/decks');
-      return response.data.map(mapDeck);
-    } catch (e) {
-      console.warn('Backend not available, returning mock data');
-      return [{ id: '1', name: 'Sample Deck', format: 'Standard', mainboard: [], sideboard: [], cards: [] }];
-    }
+    const response = await api.get('/decks');
+    return response.data.map(mapDeck);
   },
   createDeck: async (deck: Partial<Deck>): Promise<Deck> => {
     const response = await api.post('/decks', {
