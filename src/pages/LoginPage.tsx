@@ -9,7 +9,6 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = () => {
     login();
-    navigate('/');
   };
 
   return (
@@ -48,7 +47,7 @@ const LoginPage: React.FC = () => {
             gap: '10px'
           }}
         >
-          Login with Auth0 (Mock)
+          Login with Auth0
         </button>
       </div>
     </div>

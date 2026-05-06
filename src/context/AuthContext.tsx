@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+import { setAuthToken } from '../services/api';
 
 interface User {
   name: string;
@@ -7,6 +9,7 @@ interface User {
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  isLoading: boolean;
   user: User | null;
   login: () => void;
   logout: () => void;
@@ -15,31 +18,58 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
-  });
-  const [user, setUser] = useState<User | null>(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  const { 
+    isAuthenticated, 
+    isLoading, 
+    user, 
+    loginWithRedirect, 
+    logout: auth0Logout,
+    getAccessTokenSilently
+  } = useAuth0();
+
+  useEffect(() => {
+    const updateToken = async () => {
+      if (isAuthenticated) {
+        try {
+          const token = await getAccessTokenSilently({
+            authorizationParams: {
+              audience: 'https://api.mockfield.com',
+            }
+          });
+          setAuthToken(token);
+        } catch (e: any) {
+          // If audience is missing or login is required, don't crash
+          console.warn('Silent token acquisition failed', e.error || e.message);
+          setAuthToken(null);
+        }
+      } else {
+        setAuthToken(null);
+      }
+    };
+    updateToken();
+  }, [isAuthenticated, getAccessTokenSilently]);
 
   const login = () => {
-    const mockUser = { name: 'Test User', email: 'test@example.com' };
-    setIsAuthenticated(true);
-    setUser(mockUser);
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('user', JSON.stringify(mockUser));
+    loginWithRedirect();
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
+    auth0Logout({ logoutParams: { returnTo: window.location.origin } });
   };
 
+  const formattedUser = user ? {
+    name: user.name || '',
+    email: user.email || ''
+  } : null;
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated, 
+      isLoading, 
+      user: formattedUser, 
+      login, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

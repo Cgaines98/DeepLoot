@@ -4,6 +4,18 @@ import { Card, Deck, DeckCard } from '../types';
 const SCRYFALL_API = 'https://api.scryfall.com';
 const BACKEND_API = 'http://localhost:8080/api'; // Standard Spring Boot port
 
+const api = axios.create({
+  baseURL: BACKEND_API
+});
+
+export const setAuthToken = (token: string | null) => {
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete api.defaults.headers.common['Authorization'];
+  }
+};
+
 export const scryfallService = {
   searchCards: async (query: string): Promise<Card[]> => {
     const response = await axios.get(`${SCRYFALL_API}/cards/search`, {
@@ -43,7 +55,7 @@ const mapDeck = (deck: any): Deck => ({
 export const deckService = {
   getDecks: async (): Promise<Deck[]> => {
     try {
-      const response = await axios.get(`${BACKEND_API}/decks`);
+      const response = await api.get('/decks');
       return response.data.map(mapDeck);
     } catch (e) {
       console.warn('Backend not available, returning mock data');
@@ -51,7 +63,7 @@ export const deckService = {
     }
   },
   createDeck: async (deck: Partial<Deck>): Promise<Deck> => {
-    const response = await axios.post(`${BACKEND_API}/decks`, {
+    const response = await api.post('/decks', {
       name: deck.name,
       format: deck.format,
       description: deck.description
@@ -59,7 +71,7 @@ export const deckService = {
     return mapDeck(response.data);
   },
   updateDeck: async (id: string, deck: Partial<Deck>): Promise<Deck> => {
-    const response = await axios.put(`${BACKEND_API}/decks/${id}`, {
+    const response = await api.put(`/decks/${id}`, {
       name: deck.name,
       format: deck.format,
       description: deck.description
@@ -67,7 +79,7 @@ export const deckService = {
     return mapDeck(response.data);
   },
   upsertCard: async (deckId: string, card: DeckCard, sideboard: boolean = false): Promise<Deck> => {
-    const response = await axios.put(`${BACKEND_API}/decks/${deckId}/cards`, {
+    const response = await api.put(`/decks/${deckId}/cards`, {
       card: {
         oracleId: card.oracle_id,
         name: card.name,
@@ -83,17 +95,17 @@ export const deckService = {
     return mapDeck(response.data);
   },
   removeCard: async (deckId: string, oracleId: string, sideboard: boolean = false): Promise<Deck> => {
-    const response = await axios.delete(`${BACKEND_API}/decks/${deckId}/cards/${oracleId}`, {
+    const response = await api.delete(`/decks/${deckId}/cards/${oracleId}`, {
       params: { sideboard }
     });
     return mapDeck(response.data);
   },
   getDeck: async (id: string): Promise<Deck> => {
-    const response = await axios.get(`${BACKEND_API}/decks/${id}`);
+    const response = await api.get(`/decks/${id}`);
     return mapDeck(response.data);
   },
   deleteDeck: async (id: string): Promise<void> => {
-    await axios.delete(`${BACKEND_API}/decks/${id}`);
+    await api.delete(`/decks/${id}`);
   },
   // Keep saveDeck for compatibility but implement it as update or create
   saveDeck: async (deck: Deck): Promise<Deck> => {
