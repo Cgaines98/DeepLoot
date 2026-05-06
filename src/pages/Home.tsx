@@ -8,14 +8,21 @@ import { useAuth } from '../context/AuthContext';
 const Home: React.FC = () => {
   const [decks, setDecks] = useState<Deck[]>([]);
 
-  const { user } = useAuth();
+  const { user, token, isLoading } = useAuth();
 
   useEffect(() => {
-    loadDecks();
-  }, []);
+    if (token) {
+      loadDecks();
+    }
+  }, [token]);
 
   const loadDecks = () => {
-    deckService.getDecks().then(setDecks);
+    deckService.getDecks()
+      .then(setDecks)
+      .catch(err => {
+        console.error('Failed to load decks', err);
+        // Optionally handle 401 specifically if it still happens
+      });
   };
 
   const handleDelete = async (e: React.MouseEvent, id: string, name: string) => {
