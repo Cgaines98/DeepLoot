@@ -3,9 +3,12 @@ import { Link } from 'react-router-dom';
 import { deckService } from '../services/api';
 import { Deck } from '../types';
 import { PlusCircle, Trash2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Home: React.FC = () => {
   const [decks, setDecks] = useState<Deck[]>([]);
+
+  const { user } = useAuth();
 
   useEffect(() => {
     loadDecks();
@@ -32,7 +35,10 @@ const Home: React.FC = () => {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>My Decks</h1>
+        <div>
+          <h1>My Decks</h1>
+          <p style={{ color: 'var(--text-color)', opacity: 0.7 }}>Welcome back, {user?.name}</p>
+        </div>
         <Link to="/decks/new">
           <button style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <PlusCircle size={18} /> New Deck
